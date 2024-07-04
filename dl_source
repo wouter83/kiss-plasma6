@@ -1,0 +1,68 @@
+#!/bin/bash
+
+# Check if a URL is provided
+if [ -z "$1" ]; then
+  echo "Usage: $0 <url>"
+  exit 1
+fi
+
+# Detect whether wget or curl is available
+DOWNLOAD_CMD=""
+if command -v wget &> /dev/null; then
+  DOWNLOAD_CMD="wget"
+elif command -v curl &> /dev/null; then
+  DOWNLOAD_CMD="curl -fLO"
+else
+  echo "Error: Neither wget nor curl is installed."
+  exit 1
+fi
+
+# Start of the script
+URL=$1
+FILENAME=$(basename "$URL")
+PACKAGENAME="${FILENAME%.*.*}"  # Remove .tar.gz or similar extensions
+
+# Check if the file already exists
+if [ ! -f "$FILENAME" ]; then
+  echo "Starting to download: $URL"
+  $DOWNLOAD_CMD $URL
+
+  # Check if download was successful
+  if [ $? -ne 0 ]; then
+    echo "Error downloading URL: $URL"
+    exit 1
+  fi
+else
+  echo "File $FILENAME already exists. Skipping download."
+fi
+
+# Create a directory for extraction based on the package name
+EXTRACTDIR="$PACKAGENAME"
+mkdir -p "$EXTRACTDIR"
+echo "Extracting to directory: $EXTRACTDIR"
+
+# Extract the downloaded file directly into the created directory
+tar --strip-components=1 -xf $FILENAME -C $EXTRACTDIR
+
+# Check if extraction was successful
+if [ $? -ne 0 ]; then
+  echo "Error extracting file: $FILENAME"
+  rm -rf $EXTRACTDIR
+  exit 1
+fi
+
+# Start a new shell for input
+echo "You are now in a shell for input. Type 'exit' to proceed to the end of the script."
+cd $EXTRACTDIR
+bash
+
+# Return to the original directory
+cd -
+
+# Remove the extracted directory
+echo "Removing the directory: $EXTRACTDIR"
+rm -rf $EXTRACTDIR
+
+# End of the script
+echo "You have exited the shell. This is the end of the script. Thank you for using it!"
+
