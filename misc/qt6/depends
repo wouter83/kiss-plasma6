@@ -1,0 +1,23 @@
+bison             make
+expat
+flex              make
+#libX11
+#libXdamage
+#libXext
+#libXrandr
+#libXrender
+#libXxf86vm
+libdrm
+libelf
+#libxcb
+#libxshmfence
+linux-headers     make
+#llvm
+m4                make
+meson             make
+pkgconf           make
+python            make
+wayland
+wayland-protocols make
+#xorgproto
+zlib

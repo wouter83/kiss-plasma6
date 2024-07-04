@@ -1,0 +1,13 @@
+#!/bin/sh -e
+
+export DESTDIR="$1"
+
+if [ "$(uname -m)" == "i686" ]; then
+    sed -e "/^#elif defined(Q_CC_GNU_ONLY)/s/.*/& \&\& 0/" \
+        -i qtbase/src/corelib/global/qtypes.h
+fi
+
+./configure --prefix=/usr
+
+ninja
+ninja install

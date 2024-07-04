@@ -1,0 +1,6 @@
+case $1 in
+    build-fail)
+        printf "-> %s %s\a\n" "$2" "Dropped into shell"
+        sh >/dev/tty
+    ;;
+esac

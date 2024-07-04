@@ -1,0 +1,16 @@
+#!/bin/sh -e
+
+patch -Np1 -i vlc-3.0.21-fedora_ffmpeg7-1.patch
+
+export LUA_LIBS="$(pkg-config --libs lua52)"   &&
+export CPPFLAGS="$(pkg-config --cflags lua52)"
+
+BUILDCC=gcc 
+./configure \
+	--prefix=/usr \
+	--disable-libplacebo \
+	--disable-a52 \
+	--disable-xcb
+make
+
+make docdir=/usr/share/doc/vlc-3.0.21 DESTDIR="$1" install
