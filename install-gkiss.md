@@ -54,6 +54,22 @@ export CXXFLAGS="$CFLAGS"
 # NOTE: '4' should be changed to match the number of threads.
 # 	This value can be found by running 'nproc'.
 export MAKEFLAGS="-j8"
+
+# Set up some environment variables.
+export HISTSIZE=1000
+export HISTIGNORE="&:[bf]g:exit"
+
+# Set up a red prompt for root and a green one for users.
+NORMAL="\[\e[0m\]"
+RED="\[\e[1;31m\]"
+GREEN="\[\e[1;32m\]"
+if [[ $EUID == 0 ]] ; then
+  PS1="$RED\u [ $NORMAL\w$RED ]# $NORMAL"
+else
+  PS1="$GREEN\u [ $NORMAL\w$GREEN ]\$ $NORMAL"
+fi
+
+unset script RED GREEN NORMAL
 EOF
 ```
 ```
@@ -69,7 +85,7 @@ cd /var/db/kiss/installed && kiss build *
 ```
 ### install needed packages
 ```
-kiss b libelf ncurses perl baseinit grub e2fsprogs dhcpcd efibootmgr dosfstools util-linux eudev
+kiss b libelf ncurses perl baseinit grub e2fsprogs dhcpcd efibootmgr dosfstools util-linux openssh sudo
 ```
 
 ## Kernel
@@ -97,6 +113,7 @@ adduser
 
 ## aditional
 ```
+ln -s /etc/sv/dhcpcd/ /var/service/
 echo HOSTNAME > /etc/hostname
 ```
 
@@ -104,12 +121,40 @@ Update the /etc/hosts file
 127.0.0.1  HOSTNAME.localdomain  HOSTNAME
 ::1        HOSTNAME.localdomain  HOSTNAME  ip6-localhost
 
+```
+ln -s /etc/sv/sshd /var/service/
+```
+```
+addgroup wouter wheel
+```
+
+Use `visudo` as root to uncomment the wheel group settings
+
+
 ## Grub
 ```
 grub-install --target=x86_64-efi \
-    --efi-directory=/dev/sda1 \
+    --efi-directory=/boot \
     --bootloader-id=kiss
 
 grub-mkconfig -o /boot/grub/grub.cfg
 ```
 
+
+
+## sway
+kiss b sway
+kiss b ttf-croscore
+sudo addgroup wouter input
+sudo addgroup wouter video
+sudo addgroup wouter tty
+
+ln -s /etc/sv/seatd /var/service
+
+cat >> ~/.profile << EOF
+export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/tmp/$(id -u)-runtime-dir}
+[ -d "$XDG_RUNTIME_DIR" ] || {
+        mkdir -p   "$XDG_RUNTIME_DIR"
+        chmod 0700 "$XDG_RUNTIME_DIR"
+}
+EOF
