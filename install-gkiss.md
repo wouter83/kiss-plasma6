@@ -143,6 +143,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 
 ## sway
+```
 kiss b sway
 kiss b ttf-croscore
 sudo addgroup wouter input
@@ -158,3 +159,4 @@ export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/tmp/$(id -u)-runtime-dir}
         chmod 0700 "$XDG_RUNTIME_DIR"
 }
 EOF
+```
