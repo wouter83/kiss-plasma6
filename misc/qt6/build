@@ -11,3 +11,11 @@ fi
 
 ninja
 ninja install
+
+# install sudoers file to preserve env
+mkdir -p $DESTDIR/etc/sudoers.d/
+cp qt $DESTDIR/etc/sudoers.d/
+
+# install profile file for qt6 exports
+mkdir -p $DESTDIR/etc/profile.d/
+cp qt6.sh $DESTDIR/etc/profile.d/
